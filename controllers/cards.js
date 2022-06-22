@@ -6,8 +6,8 @@ const ErrorNotFound = require('../errors/ErrorNotFound');
 const getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.status(200).send(cards))
-    .catch((err) => {
-      console.log(err.stack || err);
+    .catch(() => {
+      res.send({ message: 'Произошла ошибка с получением карточек' });
     });
 };
 
@@ -36,9 +36,10 @@ const deleteCardById = (req, res) => {
       res.status(200).send({ data: card });
     })
     .catch((err) => {
-      if (err.message === `Нет карточки с id ${req.params.cardId}`) {
+      if (res.status(404)) {
         return res.status(404).send({ message: 'Карточка не найдена' });
-      } if (err instanceof mongoose.CastError) {
+      }
+      if (err instanceof mongoose.CastError) {
         return res.status(400).send({ message: 'Переданы некорректные данные' });
       }
       return res.status(500).send({ message: 'Ошибка на сервере' });
