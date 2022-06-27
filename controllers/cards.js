@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const Card = require('../models/card');
 const ErrorNotFound = require('../errors/ErrorNotFound');
 
@@ -6,9 +5,7 @@ const ErrorNotFound = require('../errors/ErrorNotFound');
 const getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.status(200).send(cards))
-    .catch(() => {
-      res.send({ message: 'Произошла ошибка с получением карточек' });
-    });
+    .catch((err) => res.status(500).send({ message: err.message }));
 };
 
 // создание карточек
@@ -36,10 +33,10 @@ const deleteCardById = (req, res) => {
       res.status(200).send({ data: card });
     })
     .catch((err) => {
-      if (res.status(404)) {
+      if (err.statusCode === 404) {
         return res.status(404).send({ message: 'Карточка не найдена' });
       }
-      if (err instanceof mongoose.CastError) {
+      if (err.statusCode === 400) {
         return res.status(400).send({ message: 'Переданы некорректные данные' });
       }
       return res.status(500).send({ message: 'Ошибка на сервере' });

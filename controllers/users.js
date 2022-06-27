@@ -20,10 +20,10 @@ const getUserById = (req, res) => {
       res.status(200).send({ data: user });
     })
     .catch((err) => {
-      if (res.status(404)) {
+      if (err.statusCode === 404) {
         return res.status(404).send({ message: 'Пользователь не найден' });
       }
-      if (err.name === 'CastError') {
+      if (err.statusCode === 400) {
         return res.status(400).send({ message: 'Пользователя с таким id нет. Данные введены неверно' });
       }
       return res.status(500).send({ message: 'Ошибка на сервере' });
@@ -55,7 +55,7 @@ const updateUserInfo = (req, res) => {
     })
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
-      if (err.message === `Пользователь ${req.params._id} не найден`) {
+      if (err.name === 'CastError') {
         return res.status(404).send({ message: 'Пользователь не найден' });
       }
       if (err.name === 'ValidationError') {
@@ -76,11 +76,11 @@ const updateAvatar = (req, res) => {
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.statusCode === 400) {
+      if (err.name === 'ValidationError') {
         const error = Object.keys(err.errors);
         return res.status(400).send({ message: `Переданы некорректные данные: ${error.join(', ')}` });
       }
-      if (err.statusCode === 404) {
+      if (err.name === 'CastError') {
         return res.status(404).send({ message: 'Пользователь не найден' });
       }
       return res.status(500).send({ message: 'Ошибка на сервере' });
