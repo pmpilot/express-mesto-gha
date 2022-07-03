@@ -23,7 +23,7 @@ const getUserById = (req, res) => {
       if (err.statusCode === 404) {
         return res.status(404).send({ message: 'Пользователь не найден' });
       }
-      if (err.statusCode === 400) {
+      if (err.name === 'CastError') {
         return res.status(400).send({ message: 'Пользователя с таким id нет. Данные введены неверно' });
       }
       return res.status(500).send({ message: 'Ошибка на сервере' });
